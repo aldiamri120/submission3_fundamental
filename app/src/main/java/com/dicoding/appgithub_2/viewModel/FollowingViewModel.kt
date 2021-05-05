@@ -1,0 +1,37 @@
+package com.dicoding.appgithub_2.viewModel
+
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.dicoding.appgithub_2.model.UserModel
+import com.dicoding.appgithub_2.model.retrofit.ApiClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+class FollowingViewModel : ViewModel() {
+    val listFollowing = MutableLiveData<ArrayList<UserModel>>()
+
+    fun setListFollowing(username: String) {
+        ApiClient.apiReq
+            .getUserFollowing(username)
+            .enqueue(object : Callback<ArrayList<UserModel>> {
+                override fun onResponse(
+                    call: Call<ArrayList<UserModel>>,
+                    response: Response<ArrayList<UserModel>>
+                ) {
+                    if (response.isSuccessful) {
+                        listFollowing.postValue(response.body())
+                    }
+                }
+
+                override fun onFailure(call: Call<ArrayList<UserModel>>, error: Throwable) {
+                    Log.d("Failure", error.message.toString())
+                }
+
+            })
+    }
+
+    fun getListFollowing(): LiveData<ArrayList<UserModel>> = listFollowing
+}
